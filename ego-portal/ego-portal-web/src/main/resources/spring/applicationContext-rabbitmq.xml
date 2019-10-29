@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/rabbit
+           http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 配置connectionFactory -->
+    <rabbit:connection-factory id="connectionFactory"
+                               host="${spring.rabbitmq.host}"
+                               port="${spring.rabbitmq.port}"
+                               username="${spring.rabbitmq.username}"
+                               password="${spring.rabbitmq.password}"
+                               virtual-host="${spring.rabbitmq.virtual-host}"/>
+
+    <!-- 配置Template操作mq -->
+    <!--
+        exchange交换机
+        routing-key路由key可以通过代码改变
+     -->
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory"
+                     exchange="myExchange"
+                     routing-key="send.register.mail"/>
+
+    <!-- 配置RabbitAdmin -->
+    <rabbit:admin connection-factory="connectionFactory"/>
+
+    <!-- 配置队列 -->
+    <rabbit:queue name="sendMailQueue"/>
+
+    <!-- 配置交换机使用主题模式 -->
+    <rabbit:topic-exchange name="myExchange">
+        <rabbit:bindings>
+            <!-- 绑定队列 主题 -->
+            <rabbit:binding queue="sendMailQueue" pattern="send.#"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <!-- 注入消费bean -->
+    <bean id="sendMailConsumer" class="com.ego.consumer.SendMailConsumer"/>
+
+    <!--配置listener and container进行pojo的解析 -->
+    <rabbit:listener-container connection-factory="connectionFactory">
+        <rabbit:listener ref="sendMailConsumer" method="sendMail" queue-names="sendMailQueue"/>
+    </rabbit:listener-container>
+
+</beans>
