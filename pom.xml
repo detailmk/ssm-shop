@@ -54,7 +54,7 @@
         <!-- Apache其他依赖 -->
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
         <poi.version>3.17</poi.version>
-        <commons-net.version>3.3</commons-net.version>
+        <commons-net.version>3.9.0</commons-net.version>
         <commons-logging.version>1.2</commons-logging.version>
         <!-- redis依赖 2.9.1版本为了兼容 springdata-redis -->
         <jedis.version>2.9.1</jedis.version>
